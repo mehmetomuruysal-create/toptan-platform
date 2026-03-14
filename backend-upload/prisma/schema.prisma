@@ -1,0 +1,168 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  BIREYSEL
+  KOBI
+  KURUMSAL
+  ADMIN
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String?
+  name      String
+  phone     String?
+  role      Role     @default(BIREYSEL)
+
+  // OAuth alanları
+  oauthProvider    String?   // 'google' | 'apple'
+  oauthProviderId  String?   // Sağlayıcıdaki kullanıcı ID'si
+  
+  // Registration additional fields
+  companyName  String?
+  taxNumber    String?
+  taxOffice    String?
+  yearlyVolume String?
+
+  // Security features
+  isEmailVerified   Boolean   @default(false)
+  emailVerifyToken  String?
+  emailVerifyExpires DateTime?
+  
+  // Password Reset / Account Logic
+  passwordResetToken String?
+  passwordResetExpires DateTime?
+  passwordChangedAt    DateTime?
+
+  // Soft Delete and Status
+  isActive    Boolean   @default(true)
+  deletedAt   DateTime? // Soft-delete capability
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  RefreshTokens RefreshToken[]
+  Products      Product[]
+}
+
+model RefreshToken {
+  id          String   @id @default(uuid())
+  token       String   @unique  // Hashed token
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  replacedBy  String?
+  createdAt   DateTime @default(now())
+}
+
+// ── KATEGORİ VE ÜRÜNLER (PRODUCT LISTING ENGINE) ──
+
+model Category {
+  id       String     @id @default(uuid())
+  name     String
+  slug     String     @unique
+  icon     String?
+  parentId String?
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryTree")
+  products Product[]
+  level    Int        @default(0) // 0=ana kategori, 1=alt kategori vb.
+  isActive Boolean    @default(true)
+}
+
+model Product {
+  id             String   @id @default(uuid())
+  producerId     String
+  producer       User     @relation(fields: [producerId], references: [id], onDelete: Cascade)
+  
+  // Temel özellikler
+  title          String
+  slug           String   @unique
+  description    String
+  categoryId     String
+  category       Category @relation(fields: [categoryId], references: [id])
+  
+  // Fiyat ve Sipariş Kuralları
+  priceType      String   // FIXED, NEGOTIABLE, REQUEST_QUOTE
+  basePrice      Float?   // Opsiyonel taban fiyat
+  currency       String   @default("TRY")
+  priceUnit      String   @default("adet") // kg, adet, paket, vb.
+  moq            Int      @default(1)      // Minimum sipariş miktarı
+  
+  // Stok
+  stockQuantity     Int?
+  stockVisibility   String  @default("SHOW_STATUS") 
+  
+  // Lojistik ve Teslimat
+  leadTime       String?   // "10-15 is gunu"
+  shippingFrom   String?
+  
+  // İhracat
+  exportAvailable Boolean @default(false)
+  hsCode         String?  // Gümrük Tarife İstatistik Pozisyonu (GTİP)
+  originCountry  String?
+  
+  // Meta Veriler
+  status         String   @default("DRAFT") // DRAFT, PENDING_APPROVAL, ACTIVE, PAUSED, SOLD_OUT
+  approvalType   String   @default("AUTOMATIC") // AUTOMATIC, MANUAL
+  documentUrl    String?  // PDF/Excel yüklemeleri için
+  notificationPrefs String? // JSON array: ["WHATSAPP", "EMAIL", "SMS"]
+  
+  targetAmount   Float?   // Hedeflenen toplam tutar veya miktar
+  viewCount      Int      @default(0)
+  contentHash    String?  // Yapay Zeka duplikat tespiti için
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // İlişkisel Alt Modeller
+  Images     ProductImage[]
+  TechSpecs  TechSpec[]
+  PriceTiers PriceTier[]
+}
+
+model ProductImage {
+  id        String   @id @default(uuid())
+  url       String
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  isCover   Boolean  @default(false)
+  order     Int      @default(0)
+}
+
+model TechSpec {
+  id        String   @id @default(uuid())
+  key       String   // "Ağırlık", "Boyut", "Malzeme" vs.
+  value     String   // "500", "L", "Paslanmaz Çelik"
+  unit      String?  // "kg", "cm" vb. (Opsiyonel)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model PriceTier {
+  id          String   @id @default(uuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  minQuantity Int      // Örn: 100
+  maxQuantity Int?     // Örn: 500
+  price       Float    // Örn: 45
+}
+
+model PartnerSystem {
+  id        String   @id @default(uuid())
+  name      String   // Örn: "Alibaba", "Amazon"
+  baseUrl   String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
