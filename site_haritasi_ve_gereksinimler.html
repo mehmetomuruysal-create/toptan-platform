@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Toplu Satın Alma Platformu - Site Haritası ve Gereksinimler</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #0D1B2A;
+            border-bottom: 2px solid #C9952A;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #1A2D42;
+            margin-top: 30px;
+            background: #F4F6F9;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        h3 {
+            color: #1B6CA8;
+            border-left: 4px solid #C9952A;
+            padding-left: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th,
+        td {
+            border: 1px solid #CBD3DF;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #0D1B2A;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #FDF3DC;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        .badge-screen {
+            background: #E8EDF4;
+            color: #4A5568;
+        }
+
+        .badge-action {
+            background: #1B7A4E;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Toplu Satın Alma Platformu - Site Haritası ve Gereksinim Dokümanı</h1>
+    <p>Bu doküman, platformun tüm sayfalarını, butonlarını, geçişlerini ve backend gereksinimlerini detaylı bir şekilde
+        listeler. Word veya Excel ile açılabilir.</p>
+
+    <h2>1. Site Haritası (Site Map)</h2>
+
+    <h3>1.1. Ana Sayfa <span class="badge badge-screen">screen-home</span></h3>
+    <ul>
+        <li><strong>Bileşenler:</strong> Navbar, Hero Alanı, Filtreleme Çubuğu, İhale Kartları, Canlı Aktivite Paneli.
+        </li>
+        <li><strong>Eylemler:</strong> Giriş Yap, İhale Oluştur, İhale Detayına Git.</li>
+    </ul>
+
+    <h3>1.2. İhale Oluşturma Sihirbazı <span class="badge badge-screen">screen-create</span></h3>
+    <ul>
+        <li><strong>Adım 1:</strong> Ürün Bilgileri (URL Scraper dahil).</li>
+        <li><strong>Adım 2:</strong> Kategori Seçimi ve Kurallar.</li>
+        <li><strong>Adım 3:</strong> Fiyat Kademeleri ve Depozito Hesaplama.</li>
+        <li><strong>Adım 4:</strong> Önizleme ve Yayınlama.</li>
+    </ul>
+
+    <h3>1.3. İhale Detay ve Başarı Ekranları</h3>
+    <ul>
+        <li><strong>Detay:</strong> Teknik özellikler, katılımcı listesi.</li>
+        <li><strong>Başarı:</strong> Tebrik mesajı ve anasayfaya dönüş.</li>
+    </ul>
+
+    <h2>2. Buton ve Geçiş Listesi</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Buton İsmi</th>
+                <th>Hedef</th>
+                <th>Açıklama</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Giriş Yap</td>
+                <td>Auth Modal</td>
+                <td>Kullanıcı girişini sağlar.</td>
+            </tr>
+            <tr>
+                <td>İhale Oluştur</td>
+                <td>Sihirbaz</td>
+                <td>Yeni ürün ekleme sürecini başlatır.</td>
+            </tr>
+            <tr>
+                <td>Bilgileri Getir</td>
+                <td>Scraper API</td>
+                <td>Linkten veri çeker.</td>
+            </tr>
+            <tr>
+                <td>Yayınla</td>
+                <td>Başarı Ekranı</td>
+                <td>Veriyi veritabanına kaydeder.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>3. Backend Mimari Değişiklikleri</h2>
+    <ul>
+        <li><strong>Validators:</strong> Monolitik yapıdan modüler yapıya geçildi (Auth, Product, Category ayrıldı).
+        </li>
+        <li><strong>Controllers:</strong> Yeni validasyon yapısına göre güncellendi.</li>
+        <li><strong>Services:</strong> Scraper ve Auth servisleri stabilize edildi.</li>
+    </ul>
+
+    <p><em>Not: Bu dosya üzerindeki düzenlemelerinizi yapıp bana geri iletebilirsiniz.</em></p>
+</body>
+
+</html>
